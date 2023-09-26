@@ -1,5 +1,10 @@
 below contains an overview of our 32 bit processor based on risc v instruction set architecture using single cycle (in every cycle single instruction will be executed) 
 top module contains following submodules:
   1. ALU 
-  2.
-  3.
+  2. Decoder 
+      a. Main Decoder
+      b. ALU Decoder
+      c. 
+  3. Memory
+      a. Instruction Memory
+      b. 
