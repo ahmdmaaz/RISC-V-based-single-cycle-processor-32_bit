@@ -1,0 +1,20 @@
+// this contains code for program counter
+module program_counter (instruction_memory_address_o, instruction_memory_address_next_cycle_i, clock_i, reset_i); 
+    
+// input
+// instruction_memory_address = 32 bits
+input [31:0]instruction_memory_address_next_cycle_i;
+input clock_i, reset_i;
+
+// output
+output [31:0]instruction_memory_address_o;
+
+//declaring reg
+reg [31:0]instruction_memory_address_o;
+
+always @(posedge clock_i) begin
+    instruction_memory_address_o <= (reset_i == 0 ) ? 32'd0 : instruction_memory_address_next_cycle_i;
+    
+end
+    
+endmodule
