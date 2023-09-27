@@ -1,0 +1,9 @@
+// this contaains code for a adder which outputs  next program counter value
+module pc_adder(result_o, a_i, b_i);
+
+input [31:0] a_i,b_i;
+output [31:0] result_o;
+
+assign result_o = a_i + b_i;
+
+    endmodule
