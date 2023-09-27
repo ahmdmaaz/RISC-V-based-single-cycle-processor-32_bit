@@ -7,4 +7,8 @@ top module contains following submodules:
       c. 
   3. Memory
       a. Instruction Memory
-      b. 
+      b. Register memory
+      c. Data memory
+  4. Program counter
+  5. Register file / register bank 
+  6.  
