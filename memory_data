@@ -1,0 +1,18 @@
+// code for third memory = data memory
+module memory_data (memory_address_data_o, reset_i, memory_address_i, memory_address_data_i, write_enable_i, clock_i);
+    
+
+    input [31:0] memory_address_i, memory_address_data_i;
+    input clock_i, write_enable_i, reset_i;
+
+    output [31:0] memory_address_data_o;
+
+// initializing memory
+reg [31:0]data_memory[1023:0];
+
+    assign memory_address_data_o = (!reset_i) ? 32'd0 : data_memory[memory_address_i];
+
+    always @(posedge clock_i) begin
+        data_memory[memory_address_i] <= memory_address_data_i;
+    end
+    endmodule
