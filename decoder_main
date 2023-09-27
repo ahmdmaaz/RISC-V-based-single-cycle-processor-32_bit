@@ -1,0 +1,27 @@
+// this contains behavioral description for the main unit of decoder (other unit = ALU_decoder)
+module decoder_main(pcsrc_o, resultsrc_o, memwrite_o, alusrc_o, immsrc_o, regwrite_o, aluop_o, flag_zero_i, opcode_i);
+
+//describing input
+//opcode = 7bits
+input [6:0]opcode_i;
+input flag_zero_i;
+
+//describing output
+output pcsrc_o, resultsrc_o, memwrite_o, alusrc_o, regwrite_o;
+output [1:0] immsrc_o,aluop_o;
+
+// decribing wire
+wire branch;
+//using combinational logic to get data instantly, without waiting for the clock signal
+//using terneray operator to optimize the code length
+assign regwrite_o = ((opcode_i == 7'b0000011) | (opcode_i == 7'b0110011)) ? 1'b1 : 1'b0;
+assign alusrc_o = ((opcode_i == 7'b0000011) | (opcode_i == 7'b0100011)) ? 1'b1 : 1'b0;
+assign memwrite_o = (opcode_i == 7'b0100011) ? 1'b1 : 1'b0;
+assign resultsrc_o = (opcode_i == 7'b0000011) ? 1'b1 : 1'b0;
+assign branch = (opcode_i == 7'b1100011) ? 1'b1 : 1'b0;
+assign immsrc_o = (opcode_i == 7'b0100011) ? 2'b01 : (opcode_i == 7'b1100011) ? 2'b10 : 2'b00;
+assign aluop_o = (opcode_i == 7'b0110011) ? 2'b10 : (opcode_i == 7'b1100011) ? 2'b01 : 2'b00;
+assign pcsrc_o = branch & flag_zero_i;
+    
+endmodule
+                                                     
