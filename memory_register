@@ -1,0 +1,29 @@
+// code for register memory
+module memory_register (register_1_address_data_o, register_2_address_data_o, 
+register_1_address_i, register_2_address_i, write_enable_i, register_3_address_i, register_3_address_data_i,
+ clock_i, reset_i);
+
+//inputs
+// 5 register can handle 2^5 = 32 bits
+input [4:0] register_1_address_i,register_2_address_i,register_3_address_i;
+
+// 32 bit data
+input [31:0]register_3_address_data_i;
+input write_enable_i, clock_i, reset_i;
+
+//output = 32bit data
+output [31:0] register_1_address_data_o,register_2_address_data_o;
+
+// declaring memory
+reg [31:0]register_memory[31:0];
+
+// we will be dependent on clock for read operations
+assign register_1_address_data_o = (!reset_i) ? 32'd0 : register_memory[register_1_address_i];
+assign register_2_address_data_o = (!reset_i) ? 32'd0 : register_memory[register_2_address_i];
+
+// we will  do write operations on clock pulses
+always @(posedge clock_i) begin
+    register_memory[register_3_address_i] <= ((reset_i)&(write_enable_i)) ? register_3_address_data_i : 32'd0;
+
+end
+endmodule
