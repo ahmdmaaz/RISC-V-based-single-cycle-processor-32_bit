@@ -1,0 +1,22 @@
+// code for instruction memory which stores machine codes for instructions
+
+module memory_instruction (address_i, reset_i, instruction_machine_code_o);
+
+// declaring input
+// memory address = 32 bits
+input [31:0]address_i;
+input reset_i;
+
+// declaring output
+// machine code = 32 bits
+
+output [31:0]instruction_machine_code_o;
+
+// since memory is register in nature we need to initialize it as reg type
+// memory size = 32bits, memory length/count = 1024
+reg [31:0]instruction_memory[1023:0];
+
+// initialising memory
+assign instruction_machine_code_o = (reset_i == 0) ? 32'd0 : instruction_memory[address_i[31:2]];
+
+endmodule
