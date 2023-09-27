@@ -1,0 +1,118 @@
+// this the top module for the single cycle 32 bit processor based on riscv instruction set
+`include "program_counter.v"
+`include "memory_instruction.v"
+`include "memory_register.v"
+`include "sign_extension.v"
+`include "alu.v"
+`include "decoder_alu.v"
+`include "decoder_main.v"
+`include "memory_data.v"
+`include "pc_adder.v"
+module riscv_single_cycle_top_module (clock_i, reset_i);
+
+input clock_i,reset_i;
+
+//declaring wire
+//wire reset_wire_reset;
+//wire clock_wire_clock;
+wire [31:0]pc_wire_instrtnmemory;
+wire [31:0]instrtnmemory_wire_regfile__signextn;
+wire [31:0]regfile_wire_alu;
+wire [31:0]signextn_wire_alu;
+wire [2:0]aludecoder_wire_alu;
+wire [31:0]alu_wire_datamemory;
+wire [31:0]datamemory_wire_registerfile;
+wire maindecoder_wire_regfile;
+wire [31:0]pc_wire_pcnext;
+wire [1:0]maindecoder_wire_aludecoder;
+wire [31:0]registerfile_wire_datamemory;
+wire [1:0]maindecoder_wire_signextn;
+wire maindecoder_wire_datamemory;
+wire [31:0]regfile_muxwire_alu;
+wire maindecoder_wire_mux,maindecoder_wire_mux2;
+wire [31:0] datamemory_muxwire_registerfile;
+
+// instantiating sub modules
+
+program_counter program_counter_top_module_instance_1 (
+    .instruction_memory_address_o(pc_wire_instrtnmemory),
+    .instruction_memory_address_next_cycle_i(pc_wire_pcnext),
+    .clock_i(clock_i),
+    .reset_i(reset_i)
+);
+
+memory_instruction memory_instruction_top_module_instance_1(
+    .instruction_machine_code_o(instrtnmemory_wire_regfile__signextn),
+    .reset_i(reset_i),
+    .address_i(pc_wire_instrtnmemory)
+);
+
+memory_register memory_register_top_module_instance_1(
+    .register_1_address_data_o(regfile_wire_alu),
+    .register_2_address_data_o(registerfile_wire_datamemory),
+    .register_1_address_i(instrtnmemory_wire_regfile__signextn[19:15]),
+    .register_2_address_i(instrtnmemory_wire_regfile__signextn[24:20]),
+    .register_3_address_i(instrtnmemory_wire_regfile__signextn[11:7]),
+    .register_3_address_data_i(datamemory_muxwire_registerfile),
+    .clock_i(clock_i),
+    .write_enable_i(maindecoder_wire_regfile),
+   .reset_i(reset_i)
+);    
+
+sign_extension sign_extension_top_module_instance_1(
+        .bits_extended_o(signextn_wire_alu),
+        .bits_input_i(instrtnmemory_wire_regfile__signextn),
+        .immsrc_i(maindecoder_wire_signextn[0])
+
+    );
+
+alu alu_top_module_instance_1(
+    .RESULT_o(alu_wire_datamemory),
+    .flag_carry(),
+    .flag_negative(),
+    .flag_overflow(),
+    .flag_zero(),
+    .ALU_CONTROL_i(aludecoder_wire_alu),
+    .B_i(regfile_muxwire_alu),
+    .A_i(regfile_wire_alu)
+
+);    
+
+decoder_alu decoder_alu_top_module_instance_1 (
+    .alu_control_o(aludecoder_wire_alu),
+    .aluop_i(maindecoder_wire_aludecoder),
+    .func3_i(instrtnmemory_wire_regfile__signextn[14:12]),
+    .opcode5_i(instrtnmemory_wire_regfile__signextn[5]),
+    .func75_i()
+);    
+
+decoder_main decoder_main_top_module_instance_1(
+    .pcsrc_o(),
+    .resultsrc_o(maindecoder_wire_mux2),
+    .memwrite_o(maindecoder_wire_datamemory),
+    .alusrc_o(maindecoder_wire_mux),
+    .immsrc_o(maindecoder_wire_signextn),
+    .regwrite_o(maindecoder_wire_regfile),
+    .aluop_o(maindecoder_wire_aludecoder),
+    .flag_zero_i(),
+    .opcode_i(instrtnmemory_wire_regfile__signextn[6:0])
+);
+
+memory_data memory_data_top_module_instance_1 (
+        .memory_address_data_o(datamemory_wire_registerfile),
+        .memory_address_data_i(registerfile_wire_datamemory),
+        .memory_address_i(alu_wire_datamemory),
+        .write_enable_i(maindecoder_wire_datamemory),
+        .clock_i(clock_i),
+        .reset_i(reset_i)
+    );
+
+ pc_adder pc_adder_top_module_instance_1(
+    .result_o(pc_wire_pcnext),
+    .a_i(pc_wire_instrtnmemory),
+    .b_i(32'd4)
+ );   
+ // instantiating mux
+ assign regfile_muxwire_alu = (maindecoder_wire_mux == 0) ? registerfile_wire_datamemory : signextn_wire_alu;   
+assign datamemory_muxwire_registerfile = (maindecoder_wire_mux2 == 0) ? alu_wire_datamemory : datamemory_wire_registerfile;
+endmodule
