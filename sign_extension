@@ -1,0 +1,19 @@
+// this contains code for sign extension
+module sign_extension (bits_extended_o, immsrc_i, bits_input_i);
+
+    input immsrc_i;
+    input [31:0]bits_input_i;
+    output [31:0] bits_extended_o;
+    
+
+ // assign bits_extended_o = {20[bits_input_i[11]],bits_input_i};
+
+ // assign bits_extended_o = {20{bits_input_i[11]},bits_input_i};
+
+ assign bits_extended_o = (immsrc_i == 1) ? ({{20{bits_input_i[31]}},bits_input_i[31:25],bits_input_i[11:7]}) :
+                                              {{20{bits_input_i[11]}},bits_input_i};
+
+//assign bits_extended_o = (bits_input_i[11]) ? {20(1'b1),bits_input_i} : {20(1'b0),bits_input_i};
+
+    
+endmodule
